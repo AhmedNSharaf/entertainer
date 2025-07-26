@@ -1,0 +1,162 @@
+[
+  {
+    "id": 1,
+    "name": "ICAD",
+    "latLong": { "latitude": 24.255951, "longitude": 54.453478 },
+    "description": "ICAD TAQA Water Solutions SRS",
+    "address": "7F43+99Q Abu Dhabi - United Arab Emirates",
+    "filterCategory": "كافة العروض"
+  },
+  {
+    "id": 2,
+    "name": "Marfa WwTW",
+    "latLong": { "latitude": 24.038417, "longitude": 53.463917 },
+    "description": "Marfa TAQA Water Solutions SRS",
+    "address": "2FQ7+9H7 Al Mirfa, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "مطاعم فاخرة"
+  },
+  {
+    "id": 3,
+    "name": "Madinat Zayed WwTW",
+    "latLong": { "latitude": 23.616094, "longitude": 53.7634116 },
+    "description": "Madinat Zayed WwTW Water Solutions SRS",
+    "address": "JQ87+C9M Liber Offices - Madinat Zayed - MZE29 - Abu Dhabi - United Arab Emirates",
+    "filterCategory": "مطاعم ومقاهى غير رسمية"
+  },
+  {
+    "id": 4,
+    "name": "Liwa WwTW",
+    "latLong": { "latitude": 23.0850674, "longitude": 53.7685215 },
+    "description": "Liwa WwTW Water Solutions SRS",
+    "address": "3QP9+2CC - Unnamed Road - Abu Dhabi - United Arab Emirates",
+    "filterCategory": "حانات وبارات"
+  },
+  {
+    "id": 5,
+    "name": "Gayathi WwTW",
+    "latLong": { "latitude": 23.857917, "longitude": 52.827278 },
+    "description": "Gayathi WwTW Water Solutions SRS",
+    "address": "7HMJVR5G+5W",
+    "filterCategory": "مطاعم غير رسمية وكلبات خارجية"
+  },
+  {
+    "id": 6,
+    "name": "Baaya Silla WwTW",
+    "latLong": { "latitude": 24.094244, "longitude": 51.720417 },
+    "description": "Baaya Silla WwTW TAQA Water Solutions SRS",
+    "address": "7HPH3PVC+M5",
+    "filterCategory": "اماكن التسلية والترفيه"
+  },
+  {
+    "id": 7,
+    "name": "Ruwais",
+    "latLong": { "latitude": 23.959472, "longitude": 52.830083 },
+    "description": "Ruwais TAQA Water Solutions SRS",
+    "address": "7HMJXR5J+Q2",
+    "filterCategory": "جمال ولياقة بدنيه"
+  },
+  {
+    "id": 8,
+    "name": "Al Saad WwTW",
+    "latLong": { "latitude": 24.190694, "longitude": 55.466194 },
+    "description": "Al Saad WwTW TAQA Water Solutions SRS",
+    "address": "5FR8+7FG Al Ain, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "فنادة عالمية"
+  },
+  {
+    "id": 9,
+    "name": "Al Haier WwTW",
+    "latLong": { "latitude": 24.582546, "longitude": 55.731088 },
+    "description": "Al Haier WwTW TAQA Water Solutions SRS",
+    "address": "HPMJ+2C8 Bin Asmad, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "كافة العروض"
+  },
+  {
+    "id": 10,
+    "name": "Al Quoa WwTW",
+    "latLong": { "latitude": 23.407444, "longitude": 55.356012 },
+    "description": "Al Quoa WwTW TAQA Water Solutions SRS",
+    "address": "7HMQC944+XC",
+    "filterCategory": "مطاعم فاخرة"
+  },
+  {
+    "id": 11,
+    "name": "Wadi Fili WwTW",
+    "latLong": { "latitude": 24.482103, "longitude": 55.439986 },
+    "description": "Wadi Fili WwTW TAQA Water Solutions SRS",
+    "address": "FCJQ+RXX Sweihan, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "مطاعم ومقاهى غير رسمية"
+  },
+  {
+    "id": 12,
+    "name": "Al Ain Oasis",
+    "latLong": { "latitude": 24.2075, "longitude": 55.7447 },
+    "description": "Al Ain Oasis Water Solutions SRS",
+    "address": "Al Ain, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "حانات وبارات"
+  },
+  {
+    "id": 13,
+    "name": "Yas Island Plant",
+    "latLong": { "latitude": 24.4672, "longitude": 54.6031 },
+    "description": "Yas Island Plant Water Solutions SRS",
+    "address": "Yas Island, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "مطاعم غير رسمية وكلبات خارجية"
+  },
+  {
+    "id": 14,
+    "name": "Saadiyat Plant",
+    "latLong": { "latitude": 24.5425, "longitude": 54.4331 },
+    "description": "Saadiyat Plant Water Solutions SRS",
+    "address": "Saadiyat, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "اماكن التسلية والترفيه"
+  },
+  {
+    "id": 15,
+    "name": "Al Reef Plant",
+    "latLong": { "latitude": 24.4242, "longitude": 54.6078 },
+    "description": "Al Reef Plant Water Solutions SRS",
+    "address": "Al Reef, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "جمال ولياقة بدنيه"
+  },
+  {
+    "id": 16,
+    "name": "Baniyas Plant",
+    "latLong": { "latitude": 24.2746, "longitude": 54.5484 },
+    "description": "Baniyas Plant Water Solutions SRS",
+    "address": "Baniyas, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "فنادة عالمية"
+  },
+  {
+    "id": 17,
+    "name": "Mussafah Plant",
+    "latLong": { "latitude": 24.3346, "longitude": 54.5147 },
+    "description": "Mussafah Plant Water Solutions SRS",
+    "address": "Mussafah, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "كافة العروض"
+  },
+  {
+    "id": 18,
+    "name": "Khalifa City Plant",
+    "latLong": { "latitude": 24.4256, "longitude": 54.6057 },
+    "description": "Khalifa City Plant Water Solutions SRS",
+    "address": "Khalifa City, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "مطاعم فاخرة"
+  },
+  {
+    "id": 19,
+    "name": "Al Wathba Plant",
+    "latLong": { "latitude": 24.2528, "longitude": 54.7072 },
+    "description": "Al Wathba Plant Water Solutions SRS",
+    "address": "Al Wathba, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "مطاعم ومقاهى غير رسمية"
+  },
+  {
+    "id": 20,
+    "name": "Al Falah Plant",
+    "latLong": { "latitude": 24.4697, "longitude": 54.6789 },
+    "description": "Al Falah Plant Water Solutions SRS",
+    "address": "Al Falah, Abu Dhabi - United Arab Emirates",
+    "filterCategory": "حانات وبارات"
+  }
+]

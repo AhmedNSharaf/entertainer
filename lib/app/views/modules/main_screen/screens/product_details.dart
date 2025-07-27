@@ -1,11 +1,9 @@
 import 'package:enter_tainer/app/controllers/favourite_controller.dart';
-import 'package:enter_tainer/app/views/modules/Drawer/Notification/notification_screen.dart';
+import 'package:enter_tainer/app/views/modules/main_screen/widgets/share_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neuss_utils/widgets/src/txt.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/services.dart';
 import '../../../widgets/Product/product_cupon.dart';
 import '../widgets/about_product.dart';
@@ -65,7 +63,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage>
 
   @override
   Widget build(BuildContext context) {
-    final width = MediaQuery.of(context).size.width;
+    // final width = MediaQuery.of(context).size.width;
     final data = widget.restaurantData ?? {};
 
     return Scaffold(
@@ -583,158 +581,10 @@ class _ProductDetailsPageState extends State<ProductDetailsPage>
       ),
       backgroundColor: Colors.white,
       builder:
-          (context) => _ShareBottomSheet(
+          (context) => ShareBottomSheet(
             shareUrl: images.isNotEmpty ? images[currentIndex] : '',
             shareText: widget.label,
           ),
-    );
-  }
-}
-
-class _ShareBottomSheet extends StatelessWidget {
-  final String shareUrl;
-  final String shareText;
-
-  const _ShareBottomSheet({required this.shareUrl, required this.shareText});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Handle bar
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 24),
-          const Text(
-            'مشاركة',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 32),
-          // Social media buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _ShareIconButton(
-                icon: Icons.facebook,
-                label: 'Facebook',
-                color: const Color(0xFF1877F3),
-                onTap: () => _shareToFacebook(),
-              ),
-              _ShareIconButton(
-                icon: FontAwesomeIcons.whatsapp,
-                label: 'WhatsApp',
-                color: const Color(0xFF25D366),
-                onTap: () => _shareToWhatsApp(),
-              ),
-              _ShareIconButton(
-                icon: Icons.link,
-                label: 'Copy Link',
-                color: Colors.grey[700]!,
-                onTap: () {
-                  Clipboard.setData(ClipboardData(text: shareUrl));
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          // More options
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: TextButton.icon(
-              onPressed: () => Share.share(shareUrl),
-              icon: const Icon(Icons.share),
-              label: const Text('المزيد من خيارات المشاركة'),
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-              ),
-            ),
-          ),
-          SizedBox(height: MediaQuery.of(context).padding.bottom),
-        ],
-      ),
-    );
-  }
-
-  void _shareToFacebook() async {
-    final facebookUrl = Uri.encodeFull(
-      "https://www.facebook.com/sharer/sharer.php?u=$shareUrl",
-    );
-    if (await canLaunchUrl(Uri.parse(facebookUrl))) {
-      await launchUrl(
-        Uri.parse(facebookUrl),
-        mode: LaunchMode.externalApplication,
-      );
-    }
-  }
-
-  void _shareToWhatsApp() async {
-    final whatsappUrl = Uri.encodeFull("https://wa.me/?text=$shareUrl");
-    if (await canLaunchUrl(Uri.parse(whatsappUrl))) {
-      await launchUrl(
-        Uri.parse(whatsappUrl),
-        mode: LaunchMode.externalApplication,
-      );
-    }
-  }
-}
-
-class _ShareIconButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ShareIconButton({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                color: Colors.grey[700],
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

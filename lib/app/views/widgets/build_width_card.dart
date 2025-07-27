@@ -83,10 +83,7 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white,
-                      Colors.grey.shade50,
-                    ],
+                    colors: [Colors.white, Colors.grey.shade50],
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -111,7 +108,9 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                           child: Image.network(
                             widget.imageUrl,
                             width: double.infinity,
-                            height: MediaQuery.of(context).size.height * 0.15, // نفس الحجم القديم
+                            height:
+                                MediaQuery.of(context).size.height *
+                                0.15, // نفس الحجم القديم
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -139,7 +138,10 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                           top: 16,
                           right: 16,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.orange.shade600,
                               borderRadius: BorderRadius.circular(20),
@@ -154,7 +156,11 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.star, color: Colors.white, size: 16),
+                                const Icon(
+                                  Icons.star,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   widget.rating,
@@ -173,7 +179,10 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                           top: 16,
                           left: 16,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
                             decoration: BoxDecoration(
                               color: _getStatusColor().withOpacity(0.9),
                               borderRadius: BorderRadius.circular(20),
@@ -220,7 +229,11 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              Icon(Icons.restaurant, color: Colors.orange.shade600, size: 20),
+                              Icon(
+                                Icons.restaurant,
+                                color: Colors.orange.shade600,
+                                size: 20,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 widget.cuisine,
@@ -238,9 +251,24 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                             spacing: 12,
                             runSpacing: 8,
                             children: [
-                              _buildModernTag(Icons.access_time, '60 mins', Colors.blue.shade100, Colors.blue.shade700),
-                              _buildModernTag(Icons.location_on, widget.location, Colors.green.shade100, Colors.green.shade700),
-                              _buildModernTag(Icons.delivery_dining, 'توصيل سريع', Colors.purple.shade100, Colors.purple.shade700),
+                              _buildModernTag(
+                                Icons.access_time,
+                                '60 mins',
+                                Colors.blue.shade100,
+                                Colors.blue.shade700,
+                              ),
+                              _buildModernTag(
+                                Icons.location_on,
+                                widget.location,
+                                Colors.green.shade100,
+                                Colors.green.shade700,
+                              ),
+                              _buildModernTag(
+                                Icons.delivery_dining,
+                                'توصيل سريع',
+                                Colors.purple.shade100,
+                                Colors.purple.shade700,
+                              ),
                             ],
                           ),
                         ],
@@ -280,10 +308,7 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Colors.white,
-                      Colors.grey.shade50,
-                    ],
+                    colors: [Colors.white, Colors.grey.shade50],
                   ),
                   boxShadow: [
                     BoxShadow(
@@ -317,7 +342,10 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                           top: 8,
                           right: 8,
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
                             decoration: BoxDecoration(
                               color: Colors.orange.shade600,
                               borderRadius: BorderRadius.circular(12),
@@ -332,7 +360,11 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Icon(Icons.star, color: Colors.white, size: 12),
+                                const Icon(
+                                  Icons.star,
+                                  color: Colors.white,
+                                  size: 12,
+                                ),
                                 const SizedBox(width: 2),
                                 Text(
                                   widget.rating,
@@ -377,7 +409,10 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                             ),
                             const SizedBox(height: 8),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: _getStatusColor().withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(8),
@@ -400,7 +435,11 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                             const SizedBox(height: 8),
                             Row(
                               children: [
-                                Icon(Icons.access_time, color: Colors.blue.shade600, size: 12),
+                                Icon(
+                                  Icons.access_time,
+                                  color: Colors.blue.shade600,
+                                  size: 12,
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   '60m',
@@ -411,7 +450,11 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                                   ),
                                 ),
                                 const Spacer(),
-                                Icon(Icons.location_on, color: Colors.green.shade600, size: 12),
+                                Icon(
+                                  Icons.location_on,
+                                  color: Colors.green.shade600,
+                                  size: 12,
+                                ),
                                 const SizedBox(width: 4),
                                 Expanded(
                                   child: Text(
@@ -441,7 +484,12 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
     );
   }
 
-  Widget _buildModernTag(IconData icon, String text, Color bgColor, Color textColor) {
+  Widget _buildModernTag(
+    IconData icon,
+    String text,
+    Color bgColor,
+    Color textColor,
+  ) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -468,7 +516,8 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
   }
 
   Color _getStatusColor() {
-    if (widget.status.contains('مباشر') || widget.status.contains('التوصيل متاح')) {
+    if (widget.status.contains('مباشر') ||
+        widget.status.contains('التوصيل متاح')) {
       return Colors.green;
     } else if (widget.status.contains('توصيل فقط')) {
       return Colors.orange;

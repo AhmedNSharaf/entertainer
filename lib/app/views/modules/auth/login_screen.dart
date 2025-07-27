@@ -645,6 +645,7 @@ class LoginPage extends GetView<AppController> {
   }
 
   void submitLogin() {
+    // Get.to(CategoryView());
     Get.toNamed(Routes.HOME);
     // if (_formKey.currentState?.validate() ?? false) {
     //   _isLoading.value = true;

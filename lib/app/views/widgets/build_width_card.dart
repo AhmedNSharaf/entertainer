@@ -1,3 +1,4 @@
+import 'package:enter_tainer/core/utils/app_fonts.dart';
 import 'package:flutter/material.dart';
 
 class UnifiedRestaurantCard extends StatefulWidget {
@@ -164,7 +165,9 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                                 const SizedBox(width: 4),
                                 Text(
                                   widget.rating,
-                                  style: const TextStyle(
+                                  style: TextStyle(
+                                    fontFamily: AppFonts.cairoFontFamily,
+
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 14,
@@ -196,7 +199,9 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                             ),
                             child: Text(
                               widget.status,
-                              style: const TextStyle(
+                              style: TextStyle(
+                                fontFamily: AppFonts.cairoFontFamily,
+
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
@@ -217,7 +222,9 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                               Expanded(
                                 child: Text(
                                   widget.name,
-                                  style: const TextStyle(
+                                  style: TextStyle(
+                                    fontFamily: AppFonts.cairoFontFamily,
+
                                     fontWeight: FontWeight.bold,
                                     fontSize: 24,
                                     color: Colors.black87,
@@ -238,6 +245,8 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                               Text(
                                 widget.cuisine,
                                 style: TextStyle(
+                                  fontFamily: AppFonts.cairoFontFamily,
+
                                   color: Colors.grey.shade600,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -368,7 +377,9 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                                 const SizedBox(width: 2),
                                 Text(
                                   widget.rating,
-                                  style: const TextStyle(
+                                  style: TextStyle(
+                                    fontFamily: AppFonts.cairoFontFamily,
+
                                     color: Colors.white,
                                     fontWeight: FontWeight.bold,
                                     fontSize: 10,
@@ -389,7 +400,9 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                           children: [
                             Text(
                               widget.name,
-                              style: const TextStyle(
+                              style: TextStyle(
+                                fontFamily: AppFonts.cairoFontFamily,
+
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
                                 color: Colors.black87,
@@ -401,6 +414,8 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                             Text(
                               widget.cuisine,
                               style: TextStyle(
+                                fontFamily: AppFonts.cairoFontFamily,
+
                                 color: Colors.grey.shade600,
                                 fontSize: 12,
                               ),
@@ -424,6 +439,8 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                               child: Text(
                                 widget.status,
                                 style: TextStyle(
+                                  fontFamily: AppFonts.cairoFontFamily,
+
                                   color: _getStatusColor(),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 10,
@@ -444,6 +461,8 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                                 Text(
                                   '60m',
                                   style: TextStyle(
+                                    fontFamily: AppFonts.cairoFontFamily,
+
                                     color: Colors.blue.shade600,
                                     fontSize: 10,
                                     fontWeight: FontWeight.w500,
@@ -460,6 +479,8 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
                                   child: Text(
                                     widget.location,
                                     style: TextStyle(
+                                      fontFamily: AppFonts.cairoFontFamily,
+
                                       color: Colors.green.shade600,
                                       fontSize: 10,
                                       fontWeight: FontWeight.w500,
@@ -505,6 +526,8 @@ class _UnifiedRestaurantCardState extends State<UnifiedRestaurantCard>
           Text(
             text,
             style: TextStyle(
+              fontFamily: AppFonts.cairoFontFamily,
+
               color: textColor,
               fontWeight: FontWeight.bold,
               fontSize: 12,

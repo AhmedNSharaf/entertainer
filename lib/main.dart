@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:enter_tainer/app/controllers/auth_controller.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -16,48 +17,46 @@ import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // TxtManager.defaultColor = AppColors.appMainTextColor;
   await GetStorage.init();
-
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  // ✅ تسجيل الكونترولرز
   Get.put<AppController>(AppController(), permanent: true);
   Get.put<LanguageService>(LanguageService(), permanent: true);
   Get.put<ThemeService>(ThemeService(), permanent: true);
   Get.put<ApiService>(ApiService(), permanent: true);
   Get.put<FavoritesController>(FavoritesController(), permanent: true);
-  Get.put<SuperNotificationService>(
-    SuperNotificationService(),
-    permanent: true,
-  );
+  Get.put<SuperNotificationService>(SuperNotificationService(), permanent: true);
 
-  runApp(const MainApp());
+  // ✅ تسجيل AuthController والتحقق من حالة تسجيل الدخول
+  final authController = Get.put<AuthController>(AuthController(), permanent: true);
+  final bool isLoggedIn = await authController.checkLoginStatus();
+
+  // ✅ تحديد المسار الابتدائي بناءً على حالة الدخول
+  final String initialRoute = isLoggedIn ? Routes.HOME : AppPages.INITIAL;
+
+  runApp(MainApp(initialRoute: initialRoute));
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final String initialRoute;
+  const MainApp({super.key, required this.initialRoute});
 
   @override
   Widget build(BuildContext context) {
     return SuperMainApp(
       title: AppConstants.appName,
 
-      ///region Routing
-      initialRoute: AppPages.INITIAL,
+      /// Routing
+      initialRoute: initialRoute,
       getPages: AppPages.routes,
 
-      ///endregion Routing
-
-      ///region Themes
+      /// Themes
       lightTheme: AppThemes.lightTheme,
 
-      ///endregion Themes
-
-      ///region Locales
+      /// Localization
       supportedLocales: const <Locale>[Locale('ar'), Locale('en')],
       translations: AppTranslations(),
-
-      ///endregion Locales
     );
   }
 }

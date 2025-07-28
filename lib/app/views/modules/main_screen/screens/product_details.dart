@@ -1,5 +1,6 @@
 import 'package:enter_tainer/app/controllers/favourite_controller.dart';
 import 'package:enter_tainer/app/views/modules/main_screen/widgets/share_bottom_sheet.dart';
+import 'package:enter_tainer/core/utils/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neuss_utils/widgets/src/txt.dart';
@@ -253,8 +254,9 @@ class _ProductDetailsPageState extends State<ProductDetailsPage>
               children: [
                 Text(
                   widget.label,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontWeight: FontWeight.bold,
+                    fontFamily: AppFonts.cairoFontFamily,
                     fontSize: 26,
                     color: Colors.black87,
                   ),
@@ -263,7 +265,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage>
                 const SizedBox(height: 4),
                 Text(
                   widget.productName,
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                    fontFamily: AppFonts.cairoFontFamily,
+                  ),
                   textAlign: TextAlign.right,
                 ),
               ],
@@ -279,17 +285,18 @@ class _ProductDetailsPageState extends State<ProductDetailsPage>
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Text(
                   '4.3',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.amber,
+                    fontFamily: AppFonts.cairoFontFamily,
                   ),
                 ),
-                SizedBox(width: 4),
-                Icon(Icons.star, color: Colors.amber, size: 18),
+                const SizedBox(width: 4),
+                const Icon(Icons.star, color: Colors.amber, size: 18),
               ],
             ),
           ),
@@ -312,10 +319,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage>
             firstChild: Text(
               description,
               textAlign: TextAlign.right,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 color: Colors.black87,
                 height: 1.6,
+                fontFamily: AppFonts.cairoFontFamily,
               ),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
@@ -323,10 +331,11 @@ class _ProductDetailsPageState extends State<ProductDetailsPage>
             secondChild: Text(
               description,
               textAlign: TextAlign.right,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 15,
                 color: Colors.black87,
                 height: 1.6,
+                fontFamily: AppFonts.cairoFontFamily,
               ),
             ),
             crossFadeState:
@@ -352,6 +361,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage>
                   Text(
                     expanded ? 'اقرأ أقل' : 'المزيد',
                     style: TextStyle(
+                      fontFamily: AppFonts.cairoFontFamily,
+
                       fontWeight: FontWeight.bold,
                       color: Theme.of(context).primaryColor,
                     ),
@@ -374,15 +385,17 @@ class _ProductDetailsPageState extends State<ProductDetailsPage>
         border: Border.all(color: Colors.blue.withOpacity(0.2)),
       ),
       child: Row(
-        children: const [
-          Icon(Icons.location_on, color: Colors.blue, size: 24),
-          SizedBox(width: 12),
+        children: [
+          const Icon(Icons.location_on, color: Colors.blue, size: 24),
+          const SizedBox(width: 12),
           Expanded(
             child: Text(
               'ذا أندرغراوند منتجع الحبتور جراند، أوتوجراف كولكشن',
               textAlign: TextAlign.right,
               style: TextStyle(
                 fontSize: 15,
+                fontFamily: AppFonts.cairoFontFamily,
+
                 color: Colors.black87,
                 fontWeight: FontWeight.w500,
               ),
@@ -453,6 +466,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage>
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
+                fontFamily: AppFonts.cairoFontFamily,
+
                 color: color,
               ),
             ),

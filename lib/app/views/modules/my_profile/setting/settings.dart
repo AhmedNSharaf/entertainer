@@ -1,3 +1,4 @@
+import 'package:enter_tainer/app/controllers/auth_controller.dart';
 import 'package:enter_tainer/app/views/modules/my_profile/setting/products.dart';
 import 'package:enter_tainer/app/views/modules/my_profile/setting/widgets/countries_bottom_sheet.dart';
 import 'package:enter_tainer/app/views/modules/my_profile/setting/widgets/setting_item.dart';
@@ -18,12 +19,14 @@ import 'orders.dart';
 
 class Settings extends StatelessWidget {
   Settings({super.key});
+
   final NotificationController controller = Get.put(
     NotificationController(),
     permanent: true,
   );
 
-  // bool _notificationsEnabled = false;
+  // الحصول على AuthController
+  final AuthController authController = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
@@ -88,14 +91,12 @@ class Settings extends StatelessWidget {
               hasSwitch: false,
               onTap: () {
                 Get.to(() => MyFamily());
-                // Handle family
               },
             ),
             SettingItem(
               title: 'أصدقائي',
               hasSwitch: false,
               onTap: () {
-                // Handle friends
                 Get.to(() => MyFriends());
               },
             ),
@@ -106,7 +107,6 @@ class Settings extends StatelessWidget {
               hasSwitch: false,
               onTap: () {
                 Get.to(() => Products());
-                // Handle products
               },
             ),
             SettingItem(
@@ -128,7 +128,6 @@ class Settings extends StatelessWidget {
               hasSwitch: false,
               onTap: () {
                 Get.to(() => DiscountHistory());
-                // Handle system code log
               },
             ),
             SettingItem(
@@ -136,14 +135,13 @@ class Settings extends StatelessWidget {
               hasSwitch: false,
               onTap: () {
                 Get.to(() => Orders());
-                // Handle orders
               },
             ),
             SettingItem(
               title: 'الحجوزات',
               hasSwitch: false,
               onTap: () {
-                // Handle rewards
+                // Handle bookings
               },
             ),
             const SizedBox(height: 40),
@@ -164,8 +162,6 @@ class Settings extends StatelessWidget {
               hasSwitch: false,
               onTap: () {
                 Get.to(() => EmailPreferencesScreen());
-
-                // Handle email preferences
               },
             ),
             const SizedBox(height: 40),
@@ -173,7 +169,7 @@ class Settings extends StatelessWidget {
               title: 'كيف يعمل التطبيق؟',
               hasSwitch: false,
               onTap: () {
-                // Handle email preferences
+                // Handle how the app works
               },
             ),
             SettingItem(
@@ -181,7 +177,6 @@ class Settings extends StatelessWidget {
               hasSwitch: false,
               onTap: () {
                 Get.to(() => HelpAndSupportScreen());
-                // Handle email preferences
               },
             ),
             SettingItem(
@@ -189,17 +184,17 @@ class Settings extends StatelessWidget {
               hasSwitch: false,
               onTap: () {
                 Get.to(() => AboutUsInfoScreen());
-                // Handle email preferences
               },
             ),
             const SizedBox(height: 40),
+
+            // تحديث عنصر تسجيل الخروج
             SettingItem(
               title: 'تسجيل الخروج',
               hasSwitch: false,
               textColor: Colors.red,
               onTap: () {
-                Get.offAllNamed(Routes.SELECT_USER_TYPE);
-                // Handle email preferences
+                _showLogoutDialog(context);
               },
             ),
             const SizedBox(height: 40),
@@ -207,5 +202,72 @@ class Settings extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // دالة لعرض dialog تأكيد تسجيل الخروج
+  void _showLogoutDialog(BuildContext context) {
+    Get.dialog(
+      AlertDialog(
+        title: Text(
+          'تسجيل الخروج',
+          style: TextStyle(
+            fontFamily: GoogleFonts.cairo().fontFamily,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          'هل أنت متأكد من أنك تريد تسجيل الخروج؟',
+          style: TextStyle(fontFamily: GoogleFonts.cairo().fontFamily),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back(); // إغلاق الـ dialog
+            },
+            child: Text(
+              'إلغاء',
+              style: TextStyle(
+                color: Colors.grey,
+                fontFamily: GoogleFonts.cairo().fontFamily,
+              ),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Get.back(); // إغلاق الـ dialog
+              _performLogout();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(
+              'تسجيل الخروج',
+              style: TextStyle(fontFamily: GoogleFonts.cairo().fontFamily),
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  // ✅ دالة تنفيذ تسجيل الخروج - تم تبسيطها
+  void _performLogout() async {
+    try {
+      // ✅ استدعاء دالة logout من AuthController مباشرة
+      // المتحكم سيتولى العثور على البريد الإلكتروني والتعامل معه
+      await authController.logout();
+    } catch (e) {
+      print('Logout error in Settings: $e');
+      
+      // في حالة حدوث خطأ، نعرض رسالة خطأ
+      Get.snackbar(
+        'خطأ',
+        'حدث خطأ أثناء تسجيل الخروج، حاول مرة أخرى',
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
   }
 }

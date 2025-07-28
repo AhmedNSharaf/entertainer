@@ -1,8 +1,10 @@
 // ignore_for_file: depend_on_referenced_packages, must_be_immutable
 
+import 'package:enter_tainer/app/controllers/auth_controller.dart';
 import 'package:enter_tainer/app/views/modules/auth/forgetpass_view.dart';
 import 'package:enter_tainer/app/views/modules/auth/widgets/build_check_box_tile.dart';
 import 'package:enter_tainer/app/views/modules/auth/widgets/tab_item_selector.dart';
+import 'package:enter_tainer/core/utils/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:get/get.dart';
@@ -24,6 +26,7 @@ class LoginPage extends GetView<AppController> {
 
   final _phoneNum = ''.obs;
   final _email = ''.obs;
+  final RxBool isLoading = false.obs;
 
   String get phoneNum => _phoneNum.value;
   set phoneNum(String val) => _phoneNum.value = val;
@@ -40,6 +43,9 @@ class LoginPage extends GetView<AppController> {
   final _isPhoneFieldReady = false.obs;
   final _isPasswordVisible = false.obs;
   final _isLoading = false.obs;
+
+  // إضافة AuthController
+  final AuthController authController = Get.find<AuthController>();
 
   // Pre-initialize the SuperPhoneField widget
   SuperPhoneField? _phoneFieldWidget;
@@ -87,26 +93,17 @@ class LoginPage extends GetView<AppController> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // vSpace12,
-
                   // Header Section
                   _buildHeader(),
-
                   vSpace32,
-
                   // Login Method Selector
                   _buildTabSelector(),
-
                   vSpace24,
-
                   // Input Fields
                   _buildInputSection(),
-
                   vSpace32,
-
                   // Login Button and Footer
                   _buildFooterSection(),
-
                   vSpace24,
                 ],
               ),
@@ -153,9 +150,7 @@ class LoginPage extends GetView<AppController> {
               ),
             ),
           ),
-
           vSpace16,
-
           // Title
           const Txt(
             'مرحباً بك',
@@ -163,9 +158,7 @@ class LoginPage extends GetView<AppController> {
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
-
           vSpace8,
-
           const Txt(
             'سجل دخولك للوصول إلى حسابك',
             fontSize: 16,
@@ -225,80 +218,6 @@ class LoginPage extends GetView<AppController> {
     });
   }
 
-  // Widget _buildTabItem({
-  //   required LoginWith type,
-  //   required IconData icon,
-  //   required String label,
-  // }) {
-  //   return Expanded(
-  //     child: GestureDetector(
-  //       onTap: () {
-  //         _loginWith.value = type;
-  //         if (type == LoginWith.phone) {
-  //           emailController.clear();
-  //           email = '';
-  //         } else {
-  //           phoneController.clear();
-  //           phoneNum = '';
-  //         }
-  //       },
-  //       child: AnimatedContainer(
-  //         duration: const Duration(milliseconds: 300),
-  //         padding: const EdgeInsets.symmetric(vertical: 14),
-  //         decoration: BoxDecoration(
-  //           color:
-  //               _loginWith.value == type
-  //                   ? AppColors.appMainColor
-  //                   : Colors.transparent,
-  //           borderRadius: BorderRadius.circular(8),
-  //           boxShadow:
-  //               _loginWith.value == type
-  //                   ? [
-  //                     BoxShadow(
-  //                       color: AppColors.appMainColor.withOpacity(0.3),
-  //                       spreadRadius: 0,
-  //                       blurRadius: 8,
-  //                       offset: const Offset(0, 2),
-  //                     ),
-  //                   ]
-  //                   : null,
-  //         ),
-  //         child: Center(
-  //           child: Row(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-
-  //               Flexible(
-  //                 child: Txt(
-  //                   label,
-  //                   color:
-  //                       _loginWith.value == type
-  //                           ? Colors.white
-  //                           : Colors.grey[600]!,
-  //                   fontSize: 14,
-  //                   fontWeight:
-  //                       _loginWith.value == type
-  //                           ? FontWeight.w600
-  //                           : FontWeight.normal,
-  //                 ),
-  //               ),
-  //               hSpace8,
-  //               Icon(
-  //                 icon,
-  //                 color:
-  //                     _loginWith.value == type
-  //                         ? Colors.white
-  //                         : Colors.grey[600],
-  //                 size: 18,
-  //               ),
-  //             ],
-  //           ),
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
-
   Widget _buildInputSection() {
     return Column(
       children: [
@@ -307,14 +226,10 @@ class LoginPage extends GetView<AppController> {
           constraints: const BoxConstraints(minHeight: 60),
           child: _buildInputField(),
         ),
-
         vSpace16,
-
         // Password Field
         _buildPasswordField(),
-
         vSpace16,
-
         // Options Row
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -322,11 +237,9 @@ class LoginPage extends GetView<AppController> {
             Expanded(
               child: TextButton(
                 onPressed: () {
-                  // تمرير نوع تسجيل الدخول الحالي
                   Get.to(
                     () => ForgetPassPage(
                       onSubmit: (identifier) {
-                        // يمكنك إضافة معالجة إضافية هنا إذا لزم الأمر
                         print('Reset password for: $identifier');
                       },
                     ),
@@ -340,7 +253,6 @@ class LoginPage extends GetView<AppController> {
                 ),
               ),
             ),
-
             Expanded(
               child: Obx(() {
                 return BuildCheckBoxTile(
@@ -380,10 +292,16 @@ class LoginPage extends GetView<AppController> {
             controller: passController,
             obscureText: !_isPasswordVisible.value,
             textDirection: TextDirection.ltr,
-            style: const TextStyle(fontSize: 16),
+            style: TextStyle(
+              fontSize: 16,
+              fontFamily: AppFonts.cairoFontFamily,
+            ),
             decoration: InputDecoration(
               hintText: 'كلمة المرور',
-              hintStyle: TextStyle(color: Colors.grey[500]),
+              hintStyle: TextStyle(
+                color: Colors.grey[500],
+                fontFamily: AppFonts.cairoFontFamily,
+              ),
               prefixIcon: Icon(
                 Icons.lock_outline,
                 color: AppColors.appMainColor,
@@ -466,9 +384,7 @@ class LoginPage extends GetView<AppController> {
             ),
           );
         }),
-
         vSpace16,
-
         // Sign Up Link
         Directionality(
           textDirection: TextDirection.rtl,
@@ -541,10 +457,16 @@ class LoginPage extends GetView<AppController> {
                 controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 textDirection: TextDirection.ltr,
-                style: const TextStyle(fontSize: 16),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontFamily: AppFonts.cairoFontFamily,
+                ),
                 decoration: InputDecoration(
                   hintText: 'البريد الإلكتروني',
-                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  hintStyle: TextStyle(
+                    color: Colors.grey[500],
+                    fontFamily: AppFonts.cairoFontFamily,
+                  ),
                   prefixIcon: Icon(
                     Icons.email_outlined,
                     color: AppColors.appMainColor,
@@ -644,50 +566,101 @@ class LoginPage extends GetView<AppController> {
     Get.toNamed(Routes.SELECT_USER_TYPE);
   }
 
-  void submitLogin() {
-    // Get.to(CategoryView());
-    Get.toNamed(Routes.HOME);
-    // if (_formKey.currentState?.validate() ?? false) {
-    //   _isLoading.value = true;
+  // دالة تسجيل الدخول المحدثة والكاملة
+  void submitLogin() async {
+    // التحقق من صحة النموذج
+    if (_formKey.currentState?.validate() ?? false) {
+      _formKey.currentState?.save();
 
-    //   String password = passController.text.trim();
-    //   bool isValidInput = false;
-    //   String identifier = '';
+      // بدء التحميل
+      _isLoading.value = true;
 
-    //   if (_loginWith.value == LoginWith.phone) {
-    //     isValidInput = !phoneNum.isNullOrEmptyOrWhiteSpace;
-    //     identifier = phoneNum.correctPhoneDir;
-    //   } else {
-    //     isValidInput = !email.isNullOrEmptyOrWhiteSpace;
-    //     identifier = email;
-    //   }
+      try {
+        String identifier = '';
+        String password = passController.text.trim();
 
-    //   if (isValidInput) {
-    //     String verificationMessage =
-    //         _loginWith.value == LoginWith.phone
-    //             ? '${'verify phone'.tr} $identifier ${'?'.tr}'
-    //             : '${'verify email'.tr} $identifier ${'?'.tr}';
+        // التحقق من نوع تسجيل الدخول
+        if (_loginWith.value == LoginWith.email) {
+          identifier = emailController.text.trim();
+          
+          // التحقق من صحة البريد الإلكتروني
+          if (!GetUtils.isEmail(identifier)) {
+            Get.snackbar(
+              'خطأ في البيانات',
+              'يرجى إدخال بريد إلكتروني صحيح',
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+            );
+            return;
+          }
+        } else {
+          // تسجيل الدخول بالهاتف
+          identifier = phoneNum;
+          
+          if (identifier.isEmpty) {
+            Get.snackbar(
+              'خطأ في البيانات',
+              'يرجى إدخال رقم الهاتف',
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+            );
+            return;
+          }
+        }
 
-    //     showConfirmationDialog(
-    //       msg: verificationMessage,
-    //       function: () {
-    //         // Create user model based on login method
-    //         UserModel user = UserModel(
-    //           phone: _loginWith.value == LoginWith.phone ? phoneNum : null,
-    //           email: _loginWith.value == LoginWith.email ? email : null,
-    //           password: password,
-    //         );
+        // التحقق من كلمة المرور
+        if (password.isEmpty) {
+          Get.snackbar(
+            'خطأ في البيانات',
+            'يرجى إدخال كلمة المرور',
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+          );
+          return;
+        }
 
-    //         controller.verifyUserPhone(user, AuthStates.login);
-    //       },
-    //     );
-    //   }
+        // ✅ الحل: استدعاء دالة تسجيل الدخول وانتظار النتيجة
+        if (_loginWith.value == LoginWith.email) {
+          final success = await authController.login(
+            email: identifier,
+            password: password,
+          );
+          
+          // ✅ لا حاجة لفعل شيء إضافي هنا، فالـ AuthController سيتولى كل شيء
+          print('Login result: $success');
+          
+        } else {
+          // تسجيل الدخول بالهاتف غير متوفر حالياً
+          Get.snackbar(
+            'غير متوفر حالياً',
+            'تسجيل الدخول بالهاتف غير متوفر حالياً، يرجى استخدام البريد الإلكتروني',
+            backgroundColor: Colors.orange,
+            colorText: Colors.white,
+          );
+        }
 
-    //   // Reset loading state after a delay
-    //   Future.delayed(const Duration(milliseconds: 1500), () {
-    //     _isLoading.value = false;
-    //   });
-    // }
+      } catch (e) {
+        // معالجة أي أخطاء غير متوقعة
+        Get.snackbar(
+          'خطأ',
+          'حدث خطأ غير متوقع، يرجى المحاولة مرة أخرى',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+        print('Login error: $e');
+      } finally {
+        // ✅ تأكد من إيقاف التحميل دائماً
+        _isLoading.value = false;
+      }
+    } else {
+      // إذا كان النموذج غير صالح
+      Get.snackbar(
+        'بيانات غير صالحة',
+        'يرجى التأكد من إدخال جميع الحقول المطلوبة بشكل صحيح',
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+    }
   }
 
   void submitForgotPassword() {

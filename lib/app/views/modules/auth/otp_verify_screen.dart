@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'package:enter_tainer/core/routes/app_pages.dart';
+import 'package:enter_tainer/core/services/verify_otp.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -12,18 +15,27 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import '../../../../../core/utils/app_assets.dart';
 import '../../../../../core/utils/app_colors.dart';
 import '../../../controllers/app_controller.dart';
+import '../../../controllers/auth_controller.dart';
 
+// ignore: must_be_immutable
 class OTPVerifyPage extends GetView<AppController> {
-  OTPVerifyPage({super.key});
+  OTPVerifyPage({required this.email, super.key});
+  final String email;
 
+  final AuthController authController = Get.find<AuthController>();
   final TextEditingController codeController = TextEditingController();
   final _formKey = GlobalKey<FormBuilderState>();
+  final _isLoading = false.obs;
+  
+  // متغيرات للتحكم في العد التنازلي
+  final RxInt resendCooldown = 0.obs;
+  final RxBool canResend = true.obs;
+  Timer? _resendTimer;
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: SuperScaffold(
-        // gradient: appMainGradient,
         showBackBtn: false,
         body: SizedBox(
           height: double.infinity,
@@ -34,15 +46,6 @@ class OTPVerifyPage extends GetView<AppController> {
               child: ListView(
                 shrinkWrap: true,
                 children: [
-                  // Center(
-                  //   child: SuperImageView(
-                  //     imgAssetPath: 'assets/images/app_logo.png',
-                  //     height: Get.width * 0.4,
-                  //     width: Get.width * 0.7,
-                  //     fit: BoxFit.fill,
-                  //   ),
-                  // ),
-                  // vSpace32,
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Txt(
@@ -91,7 +94,6 @@ class OTPVerifyPage extends GetView<AppController> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  // const Txt("Enter the OTP code sent to your number..."),
                   vSpace16,
                   Directionality(
                     textDirection: TextDirection.ltr,
@@ -104,118 +106,66 @@ class OTPVerifyPage extends GetView<AppController> {
                       animationType: AnimationType.fade,
                       pinTheme: PinTheme(
                         shape: PinCodeFieldShape.box,
-                        borderRadius: BorderRadius.circular(5),
-                        fieldHeight: 50,
+                        borderRadius: BorderRadius.circular(8),
+                        fieldHeight: 55,
                         fieldWidth: Get.width * 0.14,
                         activeFillColor: Colors.white,
-                        inactiveFillColor: Colors.grey[200],
-                        errorBorderColor: Colors.yellow,
-
-                        selectedColor: Colors.white,
-                        inactiveColor: Colors.white,
+                        inactiveFillColor: Colors.grey[100],
+                        selectedFillColor: Colors.blue[50],
+                        errorBorderColor: Colors.red,
+                        selectedColor: AppColors.appMainColor,
+                        inactiveColor: Colors.grey[300],
+                        activeColor: AppColors.appMainColor,
+                        borderWidth: 2,
                       ),
                       pastedTextStyle: const TextStyle(color: Colors.black),
                       animationDuration: const Duration(milliseconds: 300),
-                      cursorColor: Colors.black,
+                      cursorColor: AppColors.appMainColor,
                       textStyle: const TextStyle(
                         fontSize: 20,
                         height: 1.6,
                         color: Colors.black,
+                        fontWeight: FontWeight.bold,
                       ),
-                      // backgroundColor: Colors.blue.shade50,
                       enableActiveFill: true,
-                      // errorAnimationController: errorController,
                       keyboardType: TextInputType.number,
-                      boxShadows: const [
+                      boxShadows: [
                         BoxShadow(
-                          offset: Offset(0, 1),
-                          color: Colors.black12,
-                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
                         ),
                       ],
-                      // errorAnimationController: errorController,
                       controller: codeController,
                       onCompleted: (v) {
-                        mPrint("Completed");
+                        mPrint("OTP Completed: $v");
                         verifyPressed();
                       },
                       onChanged: (value) {
-                        // mPrint(value);
+                        // يمكنك إضافة validation هنا إذا كنت تريد
                       },
                       beforeTextPaste: (text) {
                         mPrint("Allowing to paste $text");
-                        //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
-                        //but you can show anything you want here, like your pop up saying wrong paste format or etc
-                        return true;
+                        // التحقق من أن النص المنسوخ أرقام فقط
+                        return text?.contains(RegExp(r'^[0-9]+$')) ?? false;
                       },
                     ),
                   ),
+                  vSpace24,
+                  
+                  // قسم إعادة الإرسال المحسن
+                  _buildResendSection(),
+                  
+                  vSpace24,
+                  
+                  // زر التحقق
+                  _buildVerifyButton(),
+                  
                   vSpace16,
-                  RichText(
-                    textAlign: TextAlign.center,
-                    text: TextSpan(
-                      text: "Didn't receive the code?".tr,
-                      style: const TextStyle(
-                        color: AppColors.appMainColor,
-                        fontSize: 15,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: ' ${"RESEND".tr}',
-                          recognizer:
-                              TapGestureRecognizer()
-                                ..onTap = () {
-                                  Navigator.pop(context);
-                                },
-                          style: const TextStyle(
-                            color: Colors.orange,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  vSpace16,
-                  // SuperEditText(codeController, hint: AppStrings.otpCodeHint, prefixIconData: Icons.key, onSubmitted: verifyPressed),
-                  vSpace32,
-                  Center(
-                    child: ElevatedButton.icon(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                          AppColors.appMainColor,
-                        ),
-                        padding: WidgetStateProperty.all(
-                          const EdgeInsets.symmetric(
-                            vertical: 8.0,
-                            horizontal: 32,
-                          ),
-                        ),
-                      ),
-                      onPressed: verifyPressed,
-                      icon: const Icon(Icons.login, color: Colors.orange),
-                      label: const Txt('Verify', color: Colors.orange),
-                    ),
-                  ),
-                  vSpace16,
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Txt(
-                        _getChangeContactText(),
-                        color: AppColors.appMainColor,
-                      ),
-                      hSpace8,
-                      InkWell(
-                        onTap: changeNumPressed,
-                        child: const Txt(
-                          'Change It',
-                          color: AppColors.appMainColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
+                  
+                  // خيار تغيير البريد الإلكتروني
+                  _buildChangeEmailSection(),
+                  
                   vSpace48,
                 ],
               ),
@@ -226,44 +176,281 @@ class OTPVerifyPage extends GetView<AppController> {
     );
   }
 
-  // Helper method to get verification title based on registration method
+  // قسم إعادة الإرسال المحسن
+  Widget _buildResendSection() {
+    return Obx(() {
+      return Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[200]!),
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.access_time,
+                  size: 18,
+                  color: canResend.value ? Colors.green : Colors.orange,
+                ),
+                hSpace8,
+                Txt(
+                  canResend.value 
+                      ? "يمكنك إعادة الإرسال الآن"
+                      : "يمكنك إعادة الإرسال خلال ${resendCooldown.value} ثانية",
+                  fontSize: 14,
+                  color: canResend.value ? Colors.green[700] : Colors.orange[700],
+                  fontWeight: FontWeight.w500,
+                ),
+              ],
+            ),
+            vSpace12,
+            GestureDetector(
+              onTap: canResend.value ? _resendOtp : null,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 24),
+                decoration: BoxDecoration(
+                  color: canResend.value ? AppColors.appMainColor : Colors.grey[300],
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: canResend.value
+                      ? [
+                          BoxShadow(
+                            color: AppColors.appMainColor.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ]
+                      : null,
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (authController.isResending.value)
+                      const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    else
+                      Icon(
+                        Icons.refresh,
+                        color: canResend.value ? Colors.white : Colors.grey[600],
+                        size: 18,
+                      ),
+                    hSpace8,
+                    Txt(
+                      authController.isResending.value 
+                          ? "جاري الإرسال..."
+                          : "إعادة إرسال الرمز",
+                      color: canResend.value ? Colors.white : Colors.grey[600],
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  // زر التحقق المحسن
+  Widget _buildVerifyButton() {
+    return Obx(() {
+      return GestureDetector(
+        onTap: _isLoading.value ? null : verifyPressed,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            color: _isLoading.value ? Colors.grey[400] : AppColors.appMainColor,
+            borderRadius: BorderRadius.circular(12),
+            boxShadow: _isLoading.value
+                ? null
+                : [
+                    BoxShadow(
+                      color: AppColors.appMainColor.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (_isLoading.value)
+                const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+              else
+                const Icon(
+                  Icons.verified_user,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              hSpace8,
+              Txt(
+                _isLoading.value ? 'جاري التحقق...' : 'تأكيد الرمز',
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  // قسم تغيير البريد الإلكتروني
+  Widget _buildChangeEmailSection() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Txt(
+            _getChangeContactText(),
+            color: Colors.grey[600],
+            fontSize: 14,
+          ),
+          hSpace8,
+          GestureDetector(
+            onTap: changeNumPressed,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(color: AppColors.appMainColor, width: 1),
+                ),
+              ),
+              child: const Txt(
+                'تغييره',
+                color: AppColors.appMainColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Helper methods
   String _getVerificationTitle() {
     if (controller.isUsingEmail) {
-      return 'Email Verification';
+      return 'تأكيد البريد الإلكتروني';
     } else {
-      return 'Phone Number Verification';
+      return 'تأكيد رقم الهاتف';
     }
   }
 
-  // Helper method to get verification message based on registration method
   String _getVerificationMessage() {
     if (controller.isUsingEmail) {
-      return "Enter the code sent to : ".tr;
+      return "أدخل الرمز المرسل إلى: ";
     } else {
-      return "Enter the code sent to : ".tr;
+      return "أدخل الرمز المرسل إلى: ";
     }
   }
 
-  // Helper method to get contact info (phone or email)
   String _getContactInfo() {
-    return controller.contactInfo;
+    return email;
   }
 
-  // Helper method to get change contact text
   String _getChangeContactText() {
     if (controller.isUsingEmail) {
-      return 'Not correct email?';
+      return 'البريد الإلكتروني غير صحيح؟';
     } else {
-      return 'Not correct number?';
+      return 'رقم الهاتف غير صحيح؟';
     }
   }
 
+  // التحقق من OTP
   Future<void> verifyPressed() async {
-    mShowLoading(msg: 'Verifying');
-    controller.verifyOTP(codeController.text.trim());
+    if (codeController.text.trim().length != 6) {
+      _showErrorSnackbar('يرجى إدخال رمز OTP كاملاً (6 أرقام)');
+      return;
+    }
+
+    _isLoading.value = true;
+
+    try {
+      await authController.verifyOtp(email, codeController.text.trim());
+      _isLoading.value = false;
+    } catch (e) {
+      _isLoading.value = false;
+      _showErrorSnackbar('حدث خطأ أثناء التحقق: $e');
+    }
+  }
+
+  // إعادة إرسال OTP
+  Future<void> _resendOtp() async {
+    if (!canResend.value || authController.isResending.value) return;
+
+    try {
+      await authController.resendOtp(email);
+      _startResendCooldown();
+      codeController.clear();
+    } catch (e) {
+      _showErrorSnackbar('فشل في إعادة إرسال OTP: $e');
+    }
+  }
+
+  // بدء العد التنازلي
+  void _startResendCooldown() {
+    canResend.value = false;
+    resendCooldown.value = 60;
+    
+    _resendTimer?.cancel();
+    _resendTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (resendCooldown.value > 0) {
+        resendCooldown.value--;
+      } else {
+        canResend.value = true;
+        timer.cancel();
+      }
+    });
+  }
+
+  // عرض رسالة خطأ
+  void _showErrorSnackbar(String message) {
+    Get.snackbar(
+      'خطأ',
+      message,
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+      snackPosition: SnackPosition.TOP,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 8,
+      duration: const Duration(seconds: 3),
+    );
   }
 
   void changeNumPressed() {
+    // إلغاء العد التنازلي عند الرجوع
+    _resendTimer?.cancel();
     Get.back();
+  }
+
+  @override
+  void onClose() {
+    // تنظيف الموارد
+    _resendTimer?.cancel();
+    codeController.dispose();
+    // super.onClose();
   }
 }

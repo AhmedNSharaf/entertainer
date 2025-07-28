@@ -1,4 +1,5 @@
 import 'package:enter_tainer/core/utils/app_colors.dart';
+import 'package:enter_tainer/core/utils/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:neuss_utils/widgets/src/txt.dart';
 
@@ -46,6 +47,7 @@ class TabItemSelector extends StatelessWidget {
                 color: isSelected ? Colors.white : Colors.black54,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
+                fontFamily: AppFonts.cairoFontFamily,
               ),
               const SizedBox(width: 8),
               Icon(

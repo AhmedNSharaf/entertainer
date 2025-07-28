@@ -108,6 +108,7 @@ class AppController extends GetxService with VarsMixin, ConnectivityMixin, HomeM
       email = null;
     }
   }
+  
 
   @override
   void onClose() {

@@ -70,6 +70,7 @@ dependencies:
   flutter_map_marker_popup: ^7.0.0
   flutter_map_location_marker: ^9.0.0
   location_picker_flutter_map: ^3.1.0
+  shared_preferences: ^2.5.3
 
 dependency_overrides:
   win32: ^5.14.0

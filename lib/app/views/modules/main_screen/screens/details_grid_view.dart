@@ -1,3 +1,4 @@
+import 'package:enter_tainer/core/utils/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neuss_utils/utils/constants.dart';
@@ -51,7 +52,7 @@ class _DetailsGridViewState extends State<DetailsGridView> {
       });
       return;
     }
-    
+
     List<Map<String, dynamic>> temp = [];
     for (var item in widget.subCategories) {
       bool matches = false;
@@ -92,13 +93,16 @@ class _DetailsGridViewState extends State<DetailsGridView> {
     }
 
     setState(() {
-      filteredSubCategories = widget.subCategories.where((item) {
-        final name = item["name"]?.toString().toLowerCase() ?? "";
-        final description = item["description"]?.toString().toLowerCase() ?? "";
-        final searchLower = searchTerm.toLowerCase();
-        
-        return name.contains(searchLower) || description.contains(searchLower);
-      }).toList();
+      filteredSubCategories =
+          widget.subCategories.where((item) {
+            final name = item["name"]?.toString().toLowerCase() ?? "";
+            final description =
+                item["description"]?.toString().toLowerCase() ?? "";
+            final searchLower = searchTerm.toLowerCase();
+
+            return name.contains(searchLower) ||
+                description.contains(searchLower);
+          }).toList();
     });
   }
 
@@ -108,7 +112,10 @@ class _DetailsGridViewState extends State<DetailsGridView> {
       textDirection: TextDirection.rtl,
       child: Scaffold(
         appBar: AppBar(
-          title: Txt(widget.label),
+          title: Text(
+            widget.label,
+            style: TextStyle(fontFamily: AppFonts.cairoFontFamily),
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.notifications_none),
@@ -135,6 +142,9 @@ class _DetailsGridViewState extends State<DetailsGridView> {
                     child: TextField(
                       decoration: InputDecoration(
                         hintText: 'اسم المطعم، المطبخ، أو الصنف...',
+                        hintStyle: TextStyle(
+                          fontFamily: AppFonts.cairoFontFamily,
+                        ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -288,6 +298,8 @@ class _DetailsGridViewState extends State<DetailsGridView> {
                                               : "كل الأماكن"))
                                       : filter["label"],
                                   style: TextStyle(
+                                    fontFamily: AppFonts.cairoFontFamily,
+
                                     fontSize: 16,
                                     color:
                                         isSelected
@@ -333,9 +345,12 @@ class _DetailsGridViewState extends State<DetailsGridView> {
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Row(
                 children: [
-                  const Text(
+                  Text(
                     'طريقة العرض:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontFamily: AppFonts.cairoFontFamily,
+                    ),
                   ),
                   const Spacer(),
                   ViewModeToggle(
@@ -353,6 +368,8 @@ class _DetailsGridViewState extends State<DetailsGridView> {
                   Text(
                     'عدد العناصر: ${filteredSubCategories.length}',
                     style: TextStyle(
+                      fontFamily: AppFonts.cairoFontFamily,
+
                       fontSize: 14,
                       color: Colors.grey[600],
                     ),
@@ -361,58 +378,64 @@ class _DetailsGridViewState extends State<DetailsGridView> {
               ),
             ),
             Expanded(
-              child: filteredSubCategories.isEmpty
-                  ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.search_off,
-                            size: 64,
-                            color: Colors.grey,
-                          ),
-                          SizedBox(height: 16),
-                          Text(
-                            'لا توجد نتائج',
-                            style: TextStyle(
-                              fontSize: 18,
+              child:
+                  filteredSubCategories.isEmpty
+                      ? Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.search_off,
+                              size: 64,
                               color: Colors.grey,
                             ),
-                          ),
-                        ],
+                            const SizedBox(height: 16),
+                            Text(
+                              'لا توجد نتائج',
+                              style: TextStyle(
+                                fontFamily: AppFonts.cairoFontFamily,
+
+                                fontSize: 18,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      : ListView.builder(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        itemCount: filteredSubCategories.length,
+                        itemBuilder: (context, index) {
+                          final r = filteredSubCategories[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12.0,
+                            ),
+                            child: UnifiedRestaurantCard(
+                              name: r["name"]?.toString() ?? '',
+                              cuisine: r["cuisine"]?.toString() ?? '',
+                              location: r["location"]?.toString() ?? '',
+                              rating: r["rating"]?.toString() ?? '',
+                              status:
+                                  r["deliveryOnly"] == true
+                                      ? 'توصيل فقط'
+                                      : (r["delivery"] == true
+                                          ? 'التوصيل متاح'
+                                          : 'غير متاح'),
+                              imageUrl: r["image"]?.toString() ?? '',
+                              isFullWidthView: isFullWidthView,
+                              onTap: () {
+                                Get.to(
+                                  () => ProductDetailsPage(
+                                    productName: r["name"] ?? '',
+                                    label: widget.label,
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
                       ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      itemCount: filteredSubCategories.length,
-                      itemBuilder: (context, index) {
-                        final r = filteredSubCategories[index];
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 12.0),
-                          child: UnifiedRestaurantCard(
-                            name: r["name"]?.toString() ?? '',
-                            cuisine: r["cuisine"]?.toString() ?? '',
-                            location: r["location"]?.toString() ?? '',
-                            rating: r["rating"]?.toString() ?? '',
-                            status: r["deliveryOnly"] == true
-                                ? 'توصيل فقط'
-                                : (r["delivery"] == true
-                                    ? 'التوصيل متاح'
-                                    : 'غير متاح'),
-                            imageUrl: r["image"]?.toString() ?? '',
-                            isFullWidthView: isFullWidthView,
-                            onTap: () {
-                              Get.to(
-                                () => ProductDetailsPage(
-                                  productName: r["name"] ?? '',
-                                  label: widget.label,
-                                ),
-                              );
-                            },
-                          ),
-                        );
-                      },
-                    ),
             ),
           ],
         ),

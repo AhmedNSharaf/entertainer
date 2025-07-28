@@ -30,7 +30,7 @@ class AppPages {
     GetPage(name: Routes.UserProfilePage, page: () => UserProfilePage()),
     GetPage(name: Routes.LOGIN, page: () => LoginPage()),
     GetPage(name: Routes.SIGNUP, page: () => RegisterPage()),
-    GetPage(name: Routes.OTPVERIFY, page: () => OTPVerifyPage()),
+    // GetPage(name: Routes.OTPVERIFY, page: () => OTPVerifyPage()),
     GetPage(name: Routes.MAIN, page: () => MainScreen()),
             GetPage(name: Routes.SELECT_USER_TYPE, page: () => SelectUserTypePage()), // ✅ جديد
 

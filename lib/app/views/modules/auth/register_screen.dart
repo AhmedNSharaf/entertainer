@@ -2,6 +2,7 @@
 
 import 'package:enter_tainer/app/views/modules/auth/widgets/build_check_box_tile.dart';
 import 'package:enter_tainer/app/views/modules/auth/widgets/tab_item_selector.dart';
+import 'package:enter_tainer/core/utils/app_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
@@ -16,6 +17,7 @@ import '../../../../../core/routes/app_pages.dart';
 import '../../../../../core/utils/app_assets.dart';
 import '../../../../../core/utils/app_colors.dart';
 import '../../../controllers/app_controller.dart';
+import '../../../controllers/auth_controller.dart'; // إضافة AuthController
 
 enum RegisterWith { phone, email }
 
@@ -23,6 +25,9 @@ enum UserType { user, supplier }
 
 class RegisterPage extends GetView<AppController> {
   RegisterPage({super.key});
+
+  // إضافة AuthController
+  final AuthController authController = Get.put(AuthController());
 
   final _phoneNum = ''.obs;
   final _email = ''.obs;
@@ -59,7 +64,6 @@ class RegisterPage extends GetView<AppController> {
     _phoneFieldWidget ??= SuperPhoneField(
       controller: phoneController,
       initialDialCode: '+962',
-
       initialPhone: controller.phoneNum,
       enableDebug: false,
       onPhoneChanged: (phone) {},
@@ -364,6 +368,7 @@ class RegisterPage extends GetView<AppController> {
           textDirection: TextDirection.ltr,
           decoration: InputDecoration(
             hintText: hint,
+            hintStyle: TextStyle(fontFamily: AppFonts.cairoFontFamily),
             prefixIcon: Icon(icon, color: AppColors.appMainColor),
             suffixIcon: IconButton(
               icon: Icon(
@@ -389,20 +394,6 @@ class RegisterPage extends GetView<AppController> {
       );
     });
   }
-
-  // Widget _buildCheckboxTile({
-  //   required String title,
-  //   required bool value,
-  //   required ValueChanged<bool?> onChanged,
-  // }) {
-  //   return CheckboxListTile(
-  //     title: Txt(title, fontSize: 14),
-  //     value: value,
-  //     onChanged: onChanged,
-  //     activeColor: AppColors.appMainColor,
-  //     contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-  //   );
-  // }
 
   Widget _buildFooterSection() {
     return Column(
@@ -440,13 +431,16 @@ class RegisterPage extends GetView<AppController> {
                             strokeWidth: 2,
                           ),
                         )
-                        : Txt(
+                        : Text(
                           userType == UserType.supplier
                               ? 'تسجيل كمقدم خدمة'
                               : 'إنشاء حساب',
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: AppFonts.cairoFontFamily,
+                          ),
                         ),
               ),
             ),
@@ -458,7 +452,12 @@ class RegisterPage extends GetView<AppController> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Txt('لديك حساب بالفعل؟ ', fontSize: 14, color: Colors.grey),
+              Txt(
+                'لديك حساب بالفعل؟ ',
+                fontSize: 14,
+                color: Colors.grey,
+                fontFamily: AppFonts.cairoFontFamily,
+              ),
               TextButton(
                 onPressed: submitLogin,
                 child: Txt(
@@ -466,6 +465,7 @@ class RegisterPage extends GetView<AppController> {
                   fontSize: 16,
                   color: AppColors.appMainColor,
                   fontWeight: FontWeight.bold,
+                  fontFamily: AppFonts.cairoFontFamily,
                 ),
               ),
             ],
@@ -614,26 +614,34 @@ class RegisterPage extends GetView<AppController> {
     });
   }
 
-  void submitSignUp() {
+  // ✅ استخدام AuthController بدلاً من registerUser المباشر
+  void submitSignUp() async {
     if (_formKey.currentState?.validate() ?? false) {
       _isLoading.value = true;
 
-      if (_registerWith.value == RegisterWith.email) {
-        controller.setRegistrationMethod(
-          emailAddress: email,
-          userType: userType.toString().split('.').last,
-        );
-      } else {
-        controller.setRegistrationMethod(
-          phoneNumber: phoneNum,
-          userType: userType.toString().split('.').last,
-        );
-      }
+      final username = _registerWith.value == RegisterWith.email
+          ? email.split('@').first
+          : phoneNum.replaceAll('+', '');
 
-      Future.delayed(const Duration(milliseconds: 1500), () {
+      final userEmail = _registerWith.value == RegisterWith.email
+          ? email
+          : '${phoneNum.replaceAll('+', '')}@example.com'; // بديل مؤقت
+
+      try {
+        // ✅ استخدام AuthController
+        await authController.registerUser(
+          username: username,
+          email: userEmail,
+          password: passController.text,
+        );
+        
         _isLoading.value = false;
-        Get.toNamed(Routes.OTPVERIFY);
-      });
+        // AuthController يتولى الانتقال لصفحة OTP
+      } catch (e) {
+        _isLoading.value = false;
+        Get.snackbar('خطأ', 'حدث خطأ أثناء التسجيل: $e',
+            backgroundColor: Colors.red, colorText: Colors.white);
+      }
     }
   }
 

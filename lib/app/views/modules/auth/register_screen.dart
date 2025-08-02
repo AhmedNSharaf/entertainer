@@ -21,7 +21,7 @@ import '../../../controllers/auth_controller.dart';
 
 enum RegisterWith { phone, email }
 
-enum UserType {customer, provider }
+enum UserType { customer, provider }
 
 class RegisterPage extends GetView<AppController> {
   RegisterPage({super.key});
@@ -698,7 +698,7 @@ class RegisterPage extends GetView<AppController> {
           username: username, // استخدام اليوزر نيم المدخل مباشرة
           email: userEmail,
           password: passController.text,
-          role: "provider",
+          role: userType == UserType.provider ? "provider" : "customer",
         );
 
         _isLoading.value = false;

@@ -6,7 +6,7 @@ import '../../../../../core/routes/app_pages.dart';
 import '../../../../../core/utils/app_colors.dart';
 import 'package:neuss_utils/widgets/src/txt.dart';
 
-enum UserType { user, supplier }
+enum UserType { customer, provider }
 
 class SelectUserTypePage extends StatelessWidget {
   const SelectUserTypePage({super.key});
@@ -92,7 +92,7 @@ class SelectUserTypePage extends StatelessWidget {
                   title: 'عميل / مستخدم',
                   description: 'أريد الحصول على خدمات من مقدمي الخدمات',
                   color: AppColors.appMainColor,
-                  onTap: () => goToRegister(UserType.user),
+                  onTap: () => goToRegister(UserType.customer),
                   delay: 100,
                 ),
 
@@ -103,7 +103,7 @@ class SelectUserTypePage extends StatelessWidget {
                   title: 'مقدم خدمة',
                   description: 'أريد تقديم خدماتي للعملاء والحصول على دخل',
                   color: Colors.orange,
-                  onTap: () => goToRegister(UserType.supplier),
+                  onTap: () => goToRegister(UserType.provider),
                   delay: 200,
                 ),
 

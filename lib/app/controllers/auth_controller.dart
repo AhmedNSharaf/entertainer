@@ -49,65 +49,65 @@ class AuthController extends GetxController {
   }
 
   Future<void> registerUser({
-  required String username,
-  required String email,
-  required String password,
-  required String role, // ← إضافة النوع
-}) async {
-  try {
-    isLoading.value = true;
-    _showLoadingDialog();
+    required String username,
+    required String email,
+    required String password,
+    required String role, // ← إضافة النوع
+  }) async {
+    try {
+      isLoading.value = true;
+      _showLoadingDialog();
 
-    final response = await _authService.registerUser(
-      username: username,
-      email: email,
-      password: password,
-      role: role, // ← تمريره للخدمة
-    );
-
-    if (response is bool && response == true) {
-      userEmail.value = email;
-      userName.value = username;
-      userRole.value = role;
-
-      await _saveUserData(email, username,userRole.value);
-
-      Get.snackbar(
-        'تم التسجيل',
-        'تم التسجيل بنجاح. قم بتأكيد OTP.',
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
+      final response = await _authService.registerUser(
+        username: username,
+        email: email,
+        password: password,
+        role: role, // ← تمريره للخدمة
       );
-      Get.to(() => OTPVerifyPage(email: email, username: username));
-    } else if (response is Map && response['error'] == 'conflict_error') {
-      _hideLoadingDialog();
+
+      if (response is bool && response == true) {
+        userEmail.value = email;
+        userName.value = username;
+        userRole.value = role;
+
+        await _saveUserData(email, username, userRole.value);
+
+        Get.snackbar(
+          'تم التسجيل',
+          'تم التسجيل بنجاح. قم بتأكيد OTP.',
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
+        Get.to(() => OTPVerifyPage(email: email, username: username));
+      } else if (response is Map && response['error'] == 'conflict_error') {
+        _hideLoadingDialog();
+        Get.snackbar(
+          'البريد مستخدم',
+          response['message'] ?? 'هذا البريد الإلكتروني مستخدم بالفعل',
+          backgroundColor: Colors.orange,
+          colorText: Colors.white,
+        );
+      } else {
+        Get.snackbar(
+          'فشل التسجيل',
+          'تحقق من البيانات أو حاول لاحقاً.',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
+      }
+    } catch (e) {
       Get.snackbar(
-        'البريد مستخدم',
-        response['message'] ?? 'هذا البريد الإلكتروني مستخدم بالفعل',
-        backgroundColor: Colors.orange,
-        colorText: Colors.white,
-      );
-    } else {
-      Get.snackbar(
-        'فشل التسجيل',
-        'تحقق من البيانات أو حاول لاحقاً.',
+        'خطأ',
+        'حدث خطأ غير متوقع',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
+      print('Register error: $e');
+    } finally {
+      isLoading.value = false;
+      _hideLoadingDialog();
     }
-  } catch (e) {
-    Get.snackbar(
-      'خطأ',
-      'حدث خطأ غير متوقع',
-      backgroundColor: Colors.red,
-      colorText: Colors.white,
-    );
-    print('Register error: $e');
-  } finally {
-    isLoading.value = false;
-    _hideLoadingDialog();
   }
-}
 
   Future<void> verifyOtp(String email, String username, String otp) async {
     try {
@@ -115,7 +115,7 @@ class AuthController extends GetxController {
       _showLoadingDialog();
 
       final verified = await _authService.verifyOtp(email: email, otp: otp);
-      
+
       if (verified) {
         Get.snackbar(
           'تم التفعيل',
@@ -127,7 +127,11 @@ class AuthController extends GetxController {
         userEmail.value = email;
         userName.value = username; // استخدام اليوزر نيم المدخل
 
-        await _saveUserData(email, username,userRole.value); // ✅ تمرير اليوزر نيم
+        await _saveUserData(
+          email,
+          username,
+          userRole.value,
+        ); // ✅ تمرير اليوزر نيم
 
         if (userRole.toLowerCase() == 'customer') {
           Get.offAllNamed(Routes.HOME);
@@ -215,7 +219,6 @@ class AuthController extends GetxController {
         currentUser.value = user;
         isLoggedIn.value = true;
         userEmail.value = email;
-        
 
         // ✅ الحصول على نوع المستخدم من الـ response
         String userType = '';
@@ -234,7 +237,7 @@ class AuthController extends GetxController {
         // إذا لم نحصل على اليوزر نيم من السيرفر، نستخدم المحفوظ مسبقاً
         if (usernameFromResponse.isNotEmpty) {
           userName.value = usernameFromResponse;
-          await _saveUserData(email, usernameFromResponse,userType);
+          await _saveUserData(email, usernameFromResponse, userType);
         } else {
           // إذا لم نجد اليوزر نيم، نحاول الحصول عليه من المحفوظ مسبقاً
           String? savedUsername = await getSavedUserName();
@@ -243,7 +246,7 @@ class AuthController extends GetxController {
           } else {
             // كحل أخير، نقوم باستخراجه من الإيميل
             userName.value = _extractUsernameFromEmail(email);
-            await _saveUserData(email, userName.value,userType);
+            await _saveUserData(email, userName.value, userType);
           }
         }
 
@@ -459,11 +462,15 @@ class AuthController extends GetxController {
   }
 
   // ✅ تحديث دالة حفظ البريد والاسم
-  Future<void> _saveUserData(String email, String username,String userType) async {
+  Future<void> _saveUserData(
+    String email,
+    String username,
+    String userType,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_email', email);
     await prefs.setString('user_name', username); // ✅ حفظ اليوزر نيم
-    await prefs.setString('user_type', userType); 
+    await prefs.setString('user_type', userType);
   }
 
   Future<String?> getSavedUserEmail() async {
@@ -476,9 +483,10 @@ class AuthController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('user_name');
   }
+
   Future<String?> getSavedUserType() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('type');
+    return prefs.getString('user_type');
   }
 
   Future<void> _clearUserEmail() async {
@@ -507,7 +515,7 @@ class AuthController extends GetxController {
       } else {
         userName.value = _extractUsernameFromEmail(email);
         // حفظ اليوزر نيم المستخرج للمرة القادمة
-        await _saveUserData(email, userName.value,userRole.value);
+        await _saveUserData(email, userName.value, userRole.value);
       }
       isLoggedIn.value = true;
       return true;

@@ -21,7 +21,7 @@ import '../../../controllers/auth_controller.dart';
 
 enum RegisterWith { phone, email }
 
-enum UserType { user, provider }
+enum UserType {customer, provider }
 
 class RegisterPage extends GetView<AppController> {
   RegisterPage({super.key});
@@ -45,7 +45,7 @@ class RegisterPage extends GetView<AppController> {
   bool get gender => _gender.value;
   set gender(bool val) => _gender.value = val;
 
-  final _userType = UserType.user.obs;
+  final _userType = UserType.customer.obs;
   UserType get userType => _userType.value;
   set userType(UserType val) => _userType.value = val;
 
@@ -90,7 +90,7 @@ class RegisterPage extends GetView<AppController> {
     if (selectedType == 'provider') {
       userType = UserType.provider;
     } else {
-      userType = UserType.user;
+      userType = UserType.customer;
     }
 
     phoneNum = controller.phoneNum;
@@ -692,7 +692,7 @@ class RegisterPage extends GetView<AppController> {
         if (selectedType == 'provider') {
           userType = UserType.provider;
         } else {
-          userType = UserType.user;
+          userType = UserType.customer;
         }
         await authController.registerUser(
           username: username, // استخدام اليوزر نيم المدخل مباشرة

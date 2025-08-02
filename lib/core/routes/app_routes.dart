@@ -6,6 +6,7 @@ abstract class Routes {
 
   static const HOME = '/home';
   static const MAIN = '/main';
+  static const PROVIDER = '/provider';
   static const SPLASH = '/splash';
   static const LanguageSelect = '/language_select';
   static const UserProfilePage = '/new_user';

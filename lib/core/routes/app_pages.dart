@@ -1,5 +1,6 @@
 import 'package:enter_tainer/app/views/modules/auth/forgetpass_view.dart';
 import 'package:enter_tainer/app/views/modules/auth/user_type_selection_page.dart';
+import 'package:enter_tainer/app/views/modules/provider_screen.dart';
 import 'package:get/get.dart';
 
 import '../../app/views/modules/auth/login_screen.dart';
@@ -30,6 +31,7 @@ class AppPages {
     GetPage(name: Routes.UserProfilePage, page: () => UserProfilePage()),
     GetPage(name: Routes.LOGIN, page: () => LoginPage()),
     GetPage(name: Routes.SIGNUP, page: () => RegisterPage()),
+    GetPage(name: Routes.PROVIDER, page: () => ProviderScreen()),
     // GetPage(name: Routes.OTPVERIFY, page: () => OTPVerifyPage()),
     GetPage(name: Routes.MAIN, page: () => MainScreen()),
             GetPage(name: Routes.SELECT_USER_TYPE, page: () => SelectUserTypePage()), // ✅ جديد

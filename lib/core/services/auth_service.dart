@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  static const String baseUrl = 'http://10.0.2.2:5000/api';
+  static const String baseUrl = 'http://194.164.201.35:5000/api';
 
   Map<String, String> get headers => {
     'Content-Type': 'application/json',
@@ -10,28 +10,36 @@ class AuthService {
   };
 
   /// Register a new user
-  Future<bool> registerUser({
-    required String username,
-    required String email,
-    required String password,
-  }) async {
-    final url = Uri.parse('$baseUrl/users/register');
+  Future<dynamic> registerUser({
+  required String username,
+  required String email,
+  required String password,
+  required String role, // ← إضافة النوع كـ parameter
+}) async {
+  final url = Uri.parse('$baseUrl/users/register');
 
-    final body = jsonEncode({
-      "username": username,
-      "email": email,
-      "password": password,
-      "group": {"name": "customer"},
-    });
+  final body = jsonEncode({
+    "username": username,
+    "email": email,
+    "password": password,
+    "group": role, // ← استخدام النوع الديناميكي هنا
+  });
 
-    try {
-      final response = await http.post(url, headers: headers, body: body);
-      return response.statusCode == 200 || response.statusCode == 201;
-    } catch (e) {
-      print('Register error: $e');
-      return false;
+  try {
+    final response = await http.post(url, headers: headers, body: body);
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      return true;
+    } else {
+      final responseData = jsonDecode(response.body);
+      return responseData;
     }
+  } catch (e) {
+    print('Register error: $e');
+    return {'error': 'exception', 'message': 'حدث خطأ أثناء الاتصال بالسيرفر'};
   }
+}
+
 
   /// Verify OTP
   Future<bool> verifyOtp({required String email, required String otp}) async {

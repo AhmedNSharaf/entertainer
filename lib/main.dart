@@ -31,9 +31,10 @@ Future<void> main() async {
   // ✅ تسجيل AuthController والتحقق من حالة تسجيل الدخول
   final authController = Get.put<AuthController>(AuthController(), permanent: true);
   final bool isLoggedIn = await authController.checkLoginStatus();
+  final String? userType = await authController.getSavedUserType();
 
   // ✅ تحديد المسار الابتدائي بناءً على حالة الدخول
-  final String initialRoute = isLoggedIn ? Routes.HOME : AppPages.INITIAL;
+  final String initialRoute = isLoggedIn ? userType=="customer" ? Routes.HOME :Routes.PROVIDER:AppPages.INITIAL ;
 
   runApp(MainApp(initialRoute: initialRoute));
 }

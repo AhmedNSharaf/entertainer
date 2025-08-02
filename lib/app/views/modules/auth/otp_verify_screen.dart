@@ -19,8 +19,10 @@ import '../../../controllers/auth_controller.dart';
 
 // ignore: must_be_immutable
 class OTPVerifyPage extends GetView<AppController> {
-  OTPVerifyPage({required this.email, super.key});
+  OTPVerifyPage( {required this.email,required this.username, super.key});
   final String email;
+  final String username;
+
 
   final AuthController authController = Get.find<AuthController>();
   final TextEditingController codeController = TextEditingController();
@@ -389,7 +391,7 @@ class OTPVerifyPage extends GetView<AppController> {
     _isLoading.value = true;
 
     try {
-      await authController.verifyOtp(email, codeController.text.trim());
+      await authController.verifyOtp(email, username,codeController.text.trim());
       _isLoading.value = false;
     } catch (e) {
       _isLoading.value = false;

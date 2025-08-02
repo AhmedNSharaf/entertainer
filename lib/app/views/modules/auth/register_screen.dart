@@ -17,26 +17,29 @@ import '../../../../../core/routes/app_pages.dart';
 import '../../../../../core/utils/app_assets.dart';
 import '../../../../../core/utils/app_colors.dart';
 import '../../../controllers/app_controller.dart';
-import '../../../controllers/auth_controller.dart'; // إضافة AuthController
+import '../../../controllers/auth_controller.dart';
 
 enum RegisterWith { phone, email }
 
-enum UserType { user, supplier }
+enum UserType { user, provider }
 
 class RegisterPage extends GetView<AppController> {
   RegisterPage({super.key});
 
-  // إضافة AuthController
   final AuthController authController = Get.put(AuthController());
 
   final _phoneNum = ''.obs;
   final _email = ''.obs;
+  final _username = ''.obs; // إضافة اليوزر نيم
 
   String get phoneNum => _phoneNum.value;
   set phoneNum(String val) => _phoneNum.value = val;
 
   String get email => _email.value;
   set email(String val) => _email.value = val;
+
+  String get username => _username.value; // إضافة getter و setter
+  set username(String val) => _username.value = val;
 
   final _gender = true.obs;
   bool get gender => _gender.value;
@@ -48,6 +51,8 @@ class RegisterPage extends GetView<AppController> {
 
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final TextEditingController usernameController =
+      TextEditingController(); // إضافة controller لليوزر نيم
   final TextEditingController passController = TextEditingController();
   final TextEditingController pass2Controller = TextEditingController();
   final _formKey = GlobalKey<FormBuilderState>();
@@ -63,6 +68,7 @@ class RegisterPage extends GetView<AppController> {
   SuperPhoneField get phoneFieldWidget {
     _phoneFieldWidget ??= SuperPhoneField(
       controller: phoneController,
+      fillColor: Colors.white,
       initialDialCode: '+962',
       initialPhone: controller.phoneNum,
       enableDebug: false,
@@ -81,8 +87,8 @@ class RegisterPage extends GetView<AppController> {
   @override
   Widget build(BuildContext context) {
     final selectedType = Get.parameters['type'];
-    if (selectedType == 'supplier') {
-      userType = UserType.supplier;
+    if (selectedType == 'provider') {
+      userType = UserType.provider;
     } else {
       userType = UserType.user;
     }
@@ -182,7 +188,7 @@ class RegisterPage extends GetView<AppController> {
 
   Widget _buildUserTypeIndicator() {
     return Obx(() {
-      final isSupplier = userType == UserType.supplier;
+      final isSupplier = userType == UserType.provider;
       return Directionality(
         textDirection: TextDirection.rtl,
         child: Container(
@@ -288,6 +294,9 @@ class RegisterPage extends GetView<AppController> {
           child: _buildInputField(),
         ),
         vSpace16,
+        // إضافة خانة اليوزر نيم
+        _buildUsernameField(),
+        vSpace16,
         Directionality(
           textDirection: TextDirection.rtl,
           child: _buildPasswordField(
@@ -338,6 +347,59 @@ class RegisterPage extends GetView<AppController> {
           );
         }),
       ],
+    );
+  }
+
+  // إضافة widget لخانة اليوزر نيم
+  Widget _buildUsernameField() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade300),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Directionality(
+        textDirection: TextDirection.rtl,
+        child: TextFormField(
+          controller: usernameController,
+          textDirection: TextDirection.ltr,
+          decoration: InputDecoration(
+            hintText: 'اسم المستخدم',
+            hintStyle: TextStyle(fontFamily: AppFonts.cairoFontFamily),
+            prefixIcon: Icon(
+              Icons.person_outline,
+              color: AppColors.appMainColor,
+            ),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 16,
+            ),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'اسم المستخدم مطلوب';
+            }
+            if (value.length < 3) {
+              return 'اسم المستخدم يجب ألا يقل عن 3 أحرف';
+            }
+            if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(value)) {
+              return 'اسم المستخدم يجب أن يحتوي على أحرف وأرقام فقط';
+            }
+            return null;
+          },
+          onChanged: (value) {
+            if (value != null) username = value;
+          },
+        ),
+      ),
     );
   }
 
@@ -432,7 +494,7 @@ class RegisterPage extends GetView<AppController> {
                           ),
                         )
                         : Text(
-                          userType == UserType.supplier
+                          userType == UserType.provider
                               ? 'تسجيل كمقدم خدمة'
                               : 'إنشاء حساب',
                           style: TextStyle(
@@ -614,33 +676,40 @@ class RegisterPage extends GetView<AppController> {
     });
   }
 
-  // ✅ استخدام AuthController بدلاً من registerUser المباشر
+  // تحديث دالة submitSignUp لاستخدام اليوزر نيم المدخل
   void submitSignUp() async {
     if (_formKey.currentState?.validate() ?? false) {
       _isLoading.value = true;
 
-      final username = _registerWith.value == RegisterWith.email
-          ? email.split('@').first
-          : phoneNum.replaceAll('+', '');
-
-      final userEmail = _registerWith.value == RegisterWith.email
-          ? email
-          : '${phoneNum.replaceAll('+', '')}@example.com'; // بديل مؤقت
+      // استخدام اسم المستخدم المدخل مباشرة بدلاً من قصه من الإيميل
+      final userEmail =
+          _registerWith.value == RegisterWith.email
+              ? email
+              : '${phoneNum.replaceAll('+', '')}@example.com';
 
       try {
-        // ✅ استخدام AuthController
+        final selectedType = Get.parameters['type'];
+        if (selectedType == 'provider') {
+          userType = UserType.provider;
+        } else {
+          userType = UserType.user;
+        }
         await authController.registerUser(
-          username: username,
+          username: username, // استخدام اليوزر نيم المدخل مباشرة
           email: userEmail,
           password: passController.text,
+          role: "provider",
         );
-        
+
         _isLoading.value = false;
-        // AuthController يتولى الانتقال لصفحة OTP
       } catch (e) {
         _isLoading.value = false;
-        Get.snackbar('خطأ', 'حدث خطأ أثناء التسجيل: $e',
-            backgroundColor: Colors.red, colorText: Colors.white);
+        Get.snackbar(
+          'خطأ',
+          'حدث خطأ أثناء التسجيل: $e',
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
       }
     }
   }

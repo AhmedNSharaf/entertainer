@@ -7,15 +7,15 @@ Future<void> registerUser({
   required String email,
   required String password,
 }) async {
-  final url = Uri.parse('http://10.0.2.2:5000/api/users/register'); // 🔁 غيّر الرابط حسب API بتاعك
+  final url = Uri.parse(
+    'http://10.0.2.2:5000/api/users/register',
+  ); // 🔁 غيّر الرابط حسب API بتاعك
 
   final body = jsonEncode({
     "username": username,
     "email": email,
     "password": password,
-    "group": {
-      "name": "customer" // ثابت حسب المطلوب منك
-    }
+    "group": "customer", // ثابت حسب المطلوب منك
   });
 
   try {

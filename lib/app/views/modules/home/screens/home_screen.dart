@@ -1,3 +1,5 @@
+import 'package:enter_tainer/app/views/modules/all_outlets/all_outlets_screen.dart';
+import 'package:enter_tainer/app/views/modules/dlivery/dlivery_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:neuss_utils/widgets/src/super_scaffold.dart';

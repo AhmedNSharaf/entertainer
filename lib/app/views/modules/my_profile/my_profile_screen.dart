@@ -1,3 +1,4 @@
+import 'package:enter_tainer/app/controllers/auth_controller.dart';
 import 'package:enter_tainer/app/views/modules/my_profile/products_screen.dart';
 import 'package:enter_tainer/app/views/modules/my_profile/setting/settings.dart';
 import 'package:enter_tainer/app/views/modules/my_profile/setting/widgets/underlined_text.dart';
@@ -19,6 +20,8 @@ class MyProfileScreen extends StatefulWidget {
 }
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
+  final AuthController authController = Get.find<AuthController>();
+
   bool isScrolled = false;
 
   @override
@@ -79,19 +82,23 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        'Omar Ragab',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 22,
+                                      Obx(
+                                        () => Text(
+                                          authController.userName.value,
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 22,
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(height: 4),
-                                      Text(
-                                        'omarragab712000@gmail.com',
-                                        style: TextStyle(
-                                          color: Colors.grey[700],
-                                          fontSize: 15,
+                                      Obx(
+                                        () => Text(
+                                          authController.userEmail.value,
+                                          style: TextStyle(
+                                            color: Colors.grey[700],
+                                            fontSize: 15,
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(height: 6),

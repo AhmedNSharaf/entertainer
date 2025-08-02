@@ -1,5 +1,7 @@
+import 'package:enter_tainer/app/views/modules/provider_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:neuss_utils/utils/utils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:enter_tainer/core/routes/app_pages.dart';
 import 'package:enter_tainer/core/services/auth_service.dart';
@@ -13,8 +15,10 @@ class AuthController extends GetxController {
   final Rxn<Map<String, dynamic>> currentUser = Rxn<Map<String, dynamic>>();
   final RxBool isResending = false.obs;
 
-  // ✅ تغيير userEmail ليكون قابل للتعديل
   final RxString userEmail = ''.obs;
+  final RxString userName = ''.obs;
+  // لتخزين نوع المستخدم
+  final RxString userRole = ''.obs;
 
   void _showLoadingDialog() {
     if (!Get.isDialogOpen!) {
@@ -45,61 +49,73 @@ class AuthController extends GetxController {
   }
 
   Future<void> registerUser({
-    required String username,
-    required String email,
-    required String password,
-  }) async {
-    try {
-      isLoading.value = true;
-      _showLoadingDialog();
+  required String username,
+  required String email,
+  required String password,
+  required String role, // ← إضافة النوع
+}) async {
+  try {
+    isLoading.value = true;
+    _showLoadingDialog();
 
-      final success = await _authService.registerUser(
-        username: username,
-        email: email,
-        password: password,
-      );
+    final response = await _authService.registerUser(
+      username: username,
+      email: email,
+      password: password,
+      role: role, // ← تمريره للخدمة
+    );
 
-      if (success) {
-        // ✅ حفظ البريد الإلكتروني
-        userEmail.value = email;
-        await _saveUserEmail(email);
+    if (response is bool && response == true) {
+      userEmail.value = email;
+      userName.value = username;
+      userRole.value = role;
 
-        Get.snackbar(
-          'تم التسجيل',
-          'تم التسجيل بنجاح. قم بتأكيد OTP.',
-          backgroundColor: Colors.green,
-          colorText: Colors.white,
-        );
-        Get.to(() => OTPVerifyPage(email: email));
-      } else {
-        Get.snackbar(
-          'فشل التسجيل',
-          'تحقق من البيانات أو حاول لاحقاً.',
-          backgroundColor: Colors.red,
-          colorText: Colors.white,
-        );
-      }
-    } catch (e) {
+      await _saveUserData(email, username,userRole.value);
+
       Get.snackbar(
-        'خطأ',
-        'حدث خطأ غير متوقع',
+        'تم التسجيل',
+        'تم التسجيل بنجاح. قم بتأكيد OTP.',
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+      );
+      Get.to(() => OTPVerifyPage(email: email, username: username));
+    } else if (response is Map && response['error'] == 'conflict_error') {
+      _hideLoadingDialog();
+      Get.snackbar(
+        'البريد مستخدم',
+        response['message'] ?? 'هذا البريد الإلكتروني مستخدم بالفعل',
+        backgroundColor: Colors.orange,
+        colorText: Colors.white,
+      );
+    } else {
+      Get.snackbar(
+        'فشل التسجيل',
+        'تحقق من البيانات أو حاول لاحقاً.',
         backgroundColor: Colors.red,
         colorText: Colors.white,
       );
-      print('Register error: $e');
-    } finally {
-      isLoading.value = false;
-      _hideLoadingDialog();
     }
+  } catch (e) {
+    Get.snackbar(
+      'خطأ',
+      'حدث خطأ غير متوقع',
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+    print('Register error: $e');
+  } finally {
+    isLoading.value = false;
+    _hideLoadingDialog();
   }
+}
 
-  Future<void> verifyOtp(String email, String otp) async {
+  Future<void> verifyOtp(String email, String username, String otp) async {
     try {
       isLoading.value = true;
       _showLoadingDialog();
 
       final verified = await _authService.verifyOtp(email: email, otp: otp);
-
+      
       if (verified) {
         Get.snackbar(
           'تم التفعيل',
@@ -107,11 +123,20 @@ class AuthController extends GetxController {
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
-        // ✅ إصلاح تخزين البريد الإلكتروني
+        // ✅ حفظ البريد الإلكتروني واليوزر نيم المدخل
         userEmail.value = email;
-        await _saveUserEmail(email);
+        userName.value = username; // استخدام اليوزر نيم المدخل
 
-        Get.offAllNamed(Routes.HOME);
+        await _saveUserData(email, username,userRole.value); // ✅ تمرير اليوزر نيم
+
+        if (userRole.toLowerCase() == 'customer') {
+          Get.offAllNamed(Routes.HOME);
+        } else if (userRole.toLowerCase() == 'provider') {
+          Get.offAll(ProviderScreen()); // تأكد من وجود هذا الـ route
+        } else {
+          // في حالة نوع مستخدم غير معروف، انتقل للصفحة الافتراضية
+          Get.offAllNamed(Routes.HOME);
+        }
       } else {
         Get.snackbar(
           'فشل التفعيل',
@@ -169,6 +194,10 @@ class AuthController extends GetxController {
     }
   }
 
+  String _extractUsernameFromEmail(String email) {
+    return email.split('@').first;
+  }
+
   Future<bool> login({required String email, required String password}) async {
     try {
       isLoading.value = true;
@@ -185,21 +214,61 @@ class AuthController extends GetxController {
 
         currentUser.value = user;
         isLoggedIn.value = true;
-
-        // ✅ حفظ البريد الإلكتروني
         userEmail.value = email;
-        await _saveUserEmail(email);
+        
+
+        // ✅ الحصول على نوع المستخدم من الـ response
+        String userType = '';
+        if (user != null &&
+            user['group'] != null &&
+            user['group']['name'] != null) {
+          userType = user['group']['name'];
+        }
+
+        // ✅ محاولة الحصول على اليوزر نيم من رد السيرفر أولاً
+        String usernameFromResponse = '';
+        if (user != null && user['username'] != null) {
+          usernameFromResponse = user['username'];
+        }
+
+        // إذا لم نحصل على اليوزر نيم من السيرفر، نستخدم المحفوظ مسبقاً
+        if (usernameFromResponse.isNotEmpty) {
+          userName.value = usernameFromResponse;
+          await _saveUserData(email, usernameFromResponse,userType);
+        } else {
+          // إذا لم نجد اليوزر نيم، نحاول الحصول عليه من المحفوظ مسبقاً
+          String? savedUsername = await getSavedUserName();
+          if (savedUsername != null && savedUsername.isNotEmpty) {
+            userName.value = savedUsername;
+          } else {
+            // كحل أخير، نقوم باستخراجه من الإيميل
+            userName.value = _extractUsernameFromEmail(email);
+            await _saveUserData(email, userName.value,userType);
+          }
+        }
 
         await _saveTokens(token, refreshToken);
 
+        // ✅ حفظ نوع المستخدم
+        // await _saveUserType(userType);
+
         Get.snackbar(
           'تم تسجيل الدخول',
-          'مرحباً ${user['email'] ?? user['username'] ?? 'بك'}',
+          'مرحباً ${userName.value}',
           backgroundColor: Colors.green,
           colorText: Colors.white,
         );
 
-        Get.offAllNamed(Routes.HOME);
+        // ✅ الانتقال بناءً على نوع المستخدم
+        if (userType.toLowerCase() == 'customer') {
+          Get.offAllNamed(Routes.HOME);
+        } else if (userType.toLowerCase() == 'provider') {
+          Get.offAll(ProviderScreen()); // تأكد من وجود هذا الـ route
+        } else {
+          // في حالة نوع مستخدم غير معروف، انتقل للصفحة الافتراضية
+          Get.offAllNamed(Routes.HOME);
+        }
+
         return true;
       } else {
         Get.snackbar(
@@ -224,25 +293,20 @@ class AuthController extends GetxController {
     }
   }
 
-  // ✅ تحديث دالة logout لتستخدم البريد المحفوظ والتعامل مع رد السيرفر
   Future<void> logout([String? email]) async {
     try {
       isLoading.value = true;
       _showLoadingDialog();
 
-      // استخدام البريد المرسل أو البريد المحفوظ
       String emailToUse = email ?? userEmail.value;
 
-      // إذا لم نجد البريد، نحاول الحصول عليه من بيانات المستخدم
       if (emailToUse.isEmpty && currentUser.value != null) {
         emailToUse = currentUser.value!['email'] ?? '';
       }
 
-      // إذا لم نجد البريد، نحاول الحصول عليه من SharedPreferences
       if (emailToUse.isEmpty) {
         emailToUse = await getSavedUserEmail() ?? '';
       }
-
 
       Map<String, dynamic>? logoutResponse;
       bool logoutSuccess = false;
@@ -257,10 +321,9 @@ class AuthController extends GetxController {
         }
       } else {
         print('No email found, performing local logout only');
-        logoutSuccess = true; // نعتبر العملية ناجحة محلياً
+        logoutSuccess = true;
       }
 
-      // ✅ في جميع الأحوال، نقوم بمسح البيانات المحلية وتسجيل الخروج
       await _clearUserData();
 
       if (logoutSuccess) {
@@ -277,7 +340,6 @@ class AuthController extends GetxController {
           colorText: Colors.white,
         );
       } else {
-        // حتى لو فشل الاتصال بالسيرفر، نعتبر العملية ناجحة محلياً
         Get.snackbar(
           'تم تسجيل الخروج',
           'تم تسجيل الخروج محلياً (فشل الاتصال بالخادم)',
@@ -286,12 +348,10 @@ class AuthController extends GetxController {
         );
       }
 
-      // ✅ الانتقال إلى صفحة تسجيل الدخول في جميع الحالات
       Get.offAllNamed(Routes.LOGIN);
     } catch (e) {
       print('Logout error: $e');
 
-      // ✅ حتى في حالة الخطأ، نقوم بمسح البيانات المحلية
       await _clearUserData();
 
       Get.snackbar(
@@ -303,10 +363,9 @@ class AuthController extends GetxController {
 
       Get.offAllNamed(Routes.LOGIN);
     } finally {
-      // ✅ التأكد من إخفاء التحميل في جميع الحالات
       isLoading.value = false;
       _hideLoadingDialog();
-      _ensureDialogsClosed(); // التأكد من إغلاق أي dialog مفتوح
+      _ensureDialogsClosed();
     }
   }
 
@@ -314,11 +373,12 @@ class AuthController extends GetxController {
     currentUser.value = null;
     isLoggedIn.value = false;
     userEmail.value = '';
+    userName.value = ''; // ✅ مسح اليوزر نيم أيضاً
     await _clearTokens();
     await _clearUserEmail();
+    await _clearUserName(); // ✅ مسح اليوزر نيم من التخزين
   }
 
-  // ✅ دالة إضافية لضمان إخفاء أي dialog مفتوح
   void _ensureDialogsClosed() {
     try {
       while (Get.isDialogOpen!) {
@@ -331,7 +391,6 @@ class AuthController extends GetxController {
 
   Future<void> forceLogout() async {
     try {
-      // ✅ إخفاء أي loading dialog مفتوح
       isLoading.value = false;
       _hideLoadingDialog();
       _ensureDialogsClosed();
@@ -380,52 +439,76 @@ class AuthController extends GetxController {
   bool get isUserLoggedIn => isLoggedIn.value;
   Map<String, dynamic>? get getUserData => currentUser.value;
   String get getCurrentUserEmail => userEmail.value;
+  String get getCurrentUserName => userName.value; // ✅ إضافة getter لليوزر نيم
 
-  // ✅ حفظ التوكنات
   Future<void> _saveTokens(String token, String refreshToken) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('access_token', token);
     await prefs.setString('refresh_token', refreshToken);
   }
 
-  // ✅ مسح التوكنات
   Future<void> _clearTokens() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('access_token');
     await prefs.remove('refresh_token');
   }
 
-  // ✅ الحصول على التوكن المحفوظ
   Future<String?> getSavedToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('access_token');
   }
 
-  // ✅ حفظ البريد الإلكتروني
-  Future<void> _saveUserEmail(String email) async {
+  // ✅ تحديث دالة حفظ البريد والاسم
+  Future<void> _saveUserData(String email, String username,String userType) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_email', email);
+    await prefs.setString('user_name', username); // ✅ حفظ اليوزر نيم
+    await prefs.setString('user_type', userType); 
   }
 
-  // ✅ الحصول على البريد الإلكتروني المحفوظ
   Future<String?> getSavedUserEmail() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('user_email');
   }
 
-  // ✅ مسح البريد الإلكتروني
+  // ✅ دالة جديدة للحصول على اليوزر نيم المحفوظ
+  Future<String?> getSavedUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_name');
+  }
+  Future<String?> getSavedUserType() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('type');
+  }
+
   Future<void> _clearUserEmail() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('user_email');
   }
 
-  // ✅ التحقق من حالة الدخول عند بدء التطبيق
+  // ✅ دالة جديدة لمسح اليوزر نيم
+  Future<void> _clearUserName() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('user_name');
+  }
+
+  // ✅ تحديث دالة التحقق من حالة الدخول
   Future<bool> checkLoginStatus() async {
     final token = await getSavedToken();
     final email = await getSavedUserEmail();
+    final username =
+        await getSavedUserName(); // ✅ الحصول على اليوزر نيم المحفوظ
 
     if (token != null && email != null) {
       userEmail.value = email;
+      // ✅ إذا وجد اليوزر نيم محفوظ، استخدمه، وإلا استخرجه من الإيميل
+      if (username != null && username.isNotEmpty) {
+        userName.value = username;
+      } else {
+        userName.value = _extractUsernameFromEmail(email);
+        // حفظ اليوزر نيم المستخرج للمرة القادمة
+        await _saveUserData(email, userName.value,userRole.value);
+      }
       isLoggedIn.value = true;
       return true;
     }

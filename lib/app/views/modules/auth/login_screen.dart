@@ -54,6 +54,7 @@ class LoginPage extends GetView<AppController> {
     _phoneFieldWidget ??= SuperPhoneField(
       controller: phoneController,
       enableDebug: false,
+      fillColor: Colors.white,
       useSimIfAvailable: true,
       initialPhone: controller.phoneNum,
       initialDialCode: '+962',
@@ -582,7 +583,7 @@ class LoginPage extends GetView<AppController> {
         // التحقق من نوع تسجيل الدخول
         if (_loginWith.value == LoginWith.email) {
           identifier = emailController.text.trim();
-          
+
           // التحقق من صحة البريد الإلكتروني
           if (!GetUtils.isEmail(identifier)) {
             Get.snackbar(
@@ -596,7 +597,7 @@ class LoginPage extends GetView<AppController> {
         } else {
           // تسجيل الدخول بالهاتف
           identifier = phoneNum;
-          
+
           if (identifier.isEmpty) {
             Get.snackbar(
               'خطأ في البيانات',
@@ -625,10 +626,9 @@ class LoginPage extends GetView<AppController> {
             email: identifier,
             password: password,
           );
-          
+
           // ✅ لا حاجة لفعل شيء إضافي هنا، فالـ AuthController سيتولى كل شيء
           print('Login result: $success');
-          
         } else {
           // تسجيل الدخول بالهاتف غير متوفر حالياً
           Get.snackbar(
@@ -638,7 +638,6 @@ class LoginPage extends GetView<AppController> {
             colorText: Colors.white,
           );
         }
-
       } catch (e) {
         // معالجة أي أخطاء غير متوقعة
         Get.snackbar(
